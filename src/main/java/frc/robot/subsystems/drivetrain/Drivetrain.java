@@ -1,6 +1,7 @@
 package frc.robot.subsystems.drivetrain;
 
 import static frc.robot.Constants.Drivetrain.*;
+import static frc.robot.Constants.Drivetrain.Settings.*;
 
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -13,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
-import frc.robot.Constants.Drivetrain.Modules;
 import frc.robot.ShamLib.AllianceManager;
 import frc.robot.ShamLib.SMF.StateMachine;
 import frc.robot.ShamLib.swerve.DriveCommand;
@@ -50,33 +50,10 @@ public class Drivetrain extends StateMachine<Drivetrain.State> {
     this.ySupplier = y;
     this.thetaSupplier = theta;
 
-    this.drive =
-        new SwerveDrive(
-            Constants.currentBuildMode,
-            PIGEON_CAN_ID,
-            Modules.DRIVE_GAINS,
-            Modules.TURN_GAINS,
-            MAX_SWERVE_LIMITS.getMaxSpeed(),
-            MAX_SWERVE_LIMITS.getMaxAcceleration(),
-            MAX_SWERVE_LIMITS.getMaxRotationalSpeed(),
-            MAX_SWERVE_LIMITS.getMaxRotationalAcceleration(),
-            Modules.MAX_TURN_SPEED,
-            Modules.MAX_TURN_ACCELERATION,
-            AUTO_THETA_GAINS,
-            AUTO_TRANSLATION_GAINS,
-            false, // Set to true for extra telemetry
-            Modules.CAN_BUS,
-            GYRO_CAN_BUS,
-            Constants.CURRENT_LIMITS_CONFIGS,
-            this,
-            false,
-            () -> flipPath,
-            Constants.Drivetrain.STATE_STD_DEVIATIONS,
-            Constants.LOOP_PERIOD,
-            Modules.MODULE_1,
-            Modules.MODULE_2,
-            Modules.MODULE_3,
-            Modules.MODULE_4);
+    SWERVE_CONFIG.subsystem = this;
+    SWERVE_CONFIG.flipTrajectory = () -> flipPath;
+
+    this.drive = new SwerveDrive(SWERVE_CONFIG);
 
     registerStateCommands(stop, incrementUp, incrementDown);
     registerTransitions();
@@ -120,7 +97,7 @@ public class Drivetrain extends StateMachine<Drivetrain.State> {
                 Constants.Controller.DEADBAND,
                 Constants.Controller.DRIVE_CONVERSION,
                 this,
-                MAX_SWERVE_LIMITS)
+                MAX_SPEED_LIMITS)
             .alongWith(new InstantCommand(() -> setFlag(State.AT_ANGLE))));
 
     registerStateCommand(State.X_SHAPE, new InstantCommand(() -> drive.setModuleStates(X_SHAPE)));
@@ -244,8 +221,6 @@ public class Drivetrain extends StateMachine<Drivetrain.State> {
     moduleStates = drive.getModuleStates();
 
     Logger.recordOutput(getName() + "/pos ", getBotPose());
-
-    // TODO: Add the limelight pose integration here using swerveDrive.addVisionMeasurement
   }
 
   public Pose2d getBotPose() {

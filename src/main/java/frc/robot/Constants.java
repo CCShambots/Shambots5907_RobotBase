@@ -1,6 +1,8 @@
 package frc.robot;
 
 import static frc.robot.Constants.Lights.Hardware.NUM_LIGHTS;
+import static frc.robot.Constants.Drivetrain.Hardware.*;
+import static frc.robot.Constants.Drivetrain.Settings.*;
 
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.ColorFlowAnimation;
@@ -27,6 +29,7 @@ import frc.robot.ShamLib.Candle.RGB;
 import frc.robot.ShamLib.PIDGains;
 import frc.robot.ShamLib.ShamLibConstants.BuildMode;
 import frc.robot.ShamLib.motors.talonfx.PIDSVGains;
+import frc.robot.ShamLib.swerve.SwerveDriveConfig;
 import frc.robot.ShamLib.swerve.SwerveSpeedLimits;
 import frc.robot.ShamLib.swerve.module.ModuleInfo;
 import frc.robot.ShamLib.swerve.module.ModuleInfo.SwerveModuleSpeedLevel;
@@ -50,6 +53,7 @@ public final class Constants {
   public static final double ENDGAME_TIME = 20;
 
   public static final class Controller {
+    //TODO: Make sure your planned controller setup aligns with these values
     public static final int LEFT_FLIGHT_STICK_ID = 1;
     public static final int RIGHT_FLIGHT_STICK_ID = 2;
     public static final int OPERATOR_CONTROLLER_ID = 0;
@@ -64,7 +68,7 @@ public final class Constants {
     public static final String TEST_SHUFFLEBOARD_TAB_ID = "Test";
     public static final String TUNE_SHUFFLEBOARD_TAB_ID = "Tune";
 
-    // Voltage below which the operator controller wills tart rumbling as a warning
+    // Voltage below which the operator controller will start rumbling as a warning
     public static final double VOLTAGE_WARNING = 7.5;
   }
 
@@ -87,74 +91,40 @@ public final class Constants {
   }
 
   public static final class Drivetrain {
-    // TODO: SET GYRO CAN INFO
-    public static final String GYRO_CAN_BUS = "";
-    public static final int PIGEON_CAN_ID = 1;
 
-    // TODO: SET TRACK WIDTH AND WHEEL_BASE
-    // Distance between centers of right and left wheels on robot in meters
-    public static final double TRACK_WIDTH = Units.inchesToMeters(0);
-    // Distance between front and back wheels on robot in meters
-    public static final double WHEEL_BASE = Units.inchesToMeters(0);
+    public static final class Sim {}
 
-    public static final double rotationRadius =
-        Math.sqrt(Math.pow(TRACK_WIDTH / 2.0, 2) + Math.pow(WHEEL_BASE / 2.0, 2)) * 2 * Math.PI;
-
-    // Standard speeds (MK4 L3 modules capable of 5.27 m/s)
-    public static final double LINEAR_SPEED = 5.27;
-    public static final double LINEAR_ACCELERATION = 10;
-    public static final double ROTARY_SPEED = (LINEAR_SPEED / rotationRadius) * (2 * Math.PI);
-    public static final double ROTARY_ACCELERATION = ROTARY_SPEED * 3;
-
-    public static final SwerveSpeedLimits MAX_SWERVE_LIMITS =
-        new SwerveSpeedLimits(LINEAR_SPEED, LINEAR_ACCELERATION, ROTARY_SPEED, ROTARY_ACCELERATION);
-
-    public static final Matrix<N3, N1> STATE_STD_DEVIATIONS = VecBuilder.fill(0.003, 0.003, 0.0002);
-
-    public static final SwerveModuleState[] X_SHAPE =
-        new SwerveModuleState[] {
-          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
-          new SwerveModuleState(0, Rotation2d.fromDegrees(-45))
-        };
-
-    // TODO: TUNE AUTO PID GAINS
-    public static final PIDGains AUTO_THETA_GAINS = new PIDGains(0, 0, 0);
-    public static final PIDGains AUTO_TRANSLATION_GAINS = new PIDGains(0, 0, 0);
-
-    // radians
-    public static final double FACE_ANGLE_TOLERANCE = 0.02;
-
-    public static final double TURN_VOLTAGE_INCREMENT = 0.125;
-    public static final double DRIVE_VOLTAGE_INCREMENT = 0.125;
-
-    public static final class Modules {
-      public static final String CAN_BUS = "";
+    public static final class Hardware {
+      // TODO: SET GYRO CAN INFO
+      public static final String GYRO_CAN_BUS = "";
+      public static final int GYRO_CAN_ID = 1;
+      
+      // TODO: SET TRACK WIDTH AND WHEEL_BASE
+      // Distance between centers of right and left wheels on robot in meters
+      public static final double TRACK_WIDTH = Units.inchesToMeters(0);
+      // Distance between front and back wheels on robot in meters
+      public static final double WHEEL_BASE = Units.inchesToMeters(0);
+  
+      public static final double ROTATION_RADIUS =
+          Math.sqrt(Math.pow(TRACK_WIDTH / 2.0, 2) + Math.pow(WHEEL_BASE / 2.0, 2)) * 2 * Math.PI;
 
       public static final double WHEEL_X_OFFSET = TRACK_WIDTH / 2;
       public static final double WHEEL_Y_OFFSET = WHEEL_BASE / 2;
 
-      // These are values we used in 2023. They seem to work with no issues
-      public static final double MAX_TURN_SPEED = 1000;
-      public static final double MAX_TURN_ACCELERATION = 1000;
-
-      // TODO: Specify information about what type of modules you're running
-      public static final SwerveModuleType MODULE_TYPE = SwerveModuleType.MK4;
-      public static final SwerveModuleSpeedLevel SPEED_LEVEL = SwerveModuleSpeedLevel.L3;
-
-      // TODO: CALCULATE TURN AND DRIVE GAINS
-      // TODO: DOCUMENTATION FOR FALCON AND SWERVE TUNING PROCESS
-      public static final PIDSVGains DRIVE_GAINS = new PIDSVGains(0, 0, 0, 0, 0);
-
-      public static final PIDSVGains TURN_GAINS = new PIDSVGains(0, 0, 0, 0, 0);
-
+      
+      //TODO: Update Swerve module type and speed level
+      public static final SwerveModuleType MODULE_TYPE = SwerveModuleType.MK4i;
+      public static final SwerveModuleSpeedLevel SPEED_LEVEL = SwerveModuleSpeedLevel.L3; 
+      
       // TODO: FILL IN MODULE CAN AND ENCODER OFFSET INFO
       // TODO: You may have to change whether the drive motors are inverted or not. The existing
       // inversions should work for a standard MK4
 
+      //Default to "*" for the first available CANivore
+      public static final String MODULE_CAN_BUS = "*";
+
       // front left
-      public static final ModuleInfo MODULE_1 =
+      public static final ModuleInfo MODULE_1_INFO =
           ModuleInfo.generateModuleInfo(
               MODULE_TYPE,
               SPEED_LEVEL,
@@ -168,7 +138,7 @@ public final class Constants {
               true);
 
       // back left
-      public static final ModuleInfo MODULE_2 =
+      public static final ModuleInfo MODULE_2_INFO =
           ModuleInfo.generateModuleInfo(
               MODULE_TYPE,
               SPEED_LEVEL,
@@ -182,7 +152,7 @@ public final class Constants {
               true);
 
       // back right
-      public static final ModuleInfo MODULE_3 =
+      public static final ModuleInfo MODULE_3_INFO =
           ModuleInfo.generateModuleInfo(
               MODULE_TYPE,
               SPEED_LEVEL,
@@ -196,7 +166,7 @@ public final class Constants {
               true);
 
       // front right
-      public static final ModuleInfo MODULE_4 =
+      public static final ModuleInfo MODULE_4_INFO =
           ModuleInfo.generateModuleInfo(
               MODULE_TYPE,
               SPEED_LEVEL,
@@ -208,6 +178,78 @@ public final class Constants {
               true,
               true,
               true);
+    }
+   
+    public static final class Settings {
+          // TODO: TUNE AUTO PID GAINS
+          public static final PIDGains AUTO_THETA_GAINS = new PIDGains(0, 0, 0);
+          public static final PIDGains AUTO_TRANSLATION_GAINS = new PIDGains(0, 0, 0);
+          
+           // These are values we used in 2023 and 2024. They seem to work with no issues
+           // Used with both Falcon500 and KrakenX60
+          public static final double MAX_MODULE_TURN_SPEED = 1000;
+          public static final double MAX_MODULE_TURN_ACCELERATION = 1000;
+
+          
+          // TODO: CALCULATE TURN AND DRIVE GAINS
+          public static final PIDSVGains MODULE_DRIVE_GAINS = new PIDSVGains(0, 0, 0, 0, 0);
+
+          public static final PIDSVGains MODULE_TURN_GAINS = new PIDSVGains(0, 0, 0, 0, 0);
+
+          // radians
+          public static final double FACE_ANGLE_TOLERANCE = 0.02;
+
+          //volts
+          public static final double TURN_VOLTAGE_INCREMENT = 0.125;
+          public static final double DRIVE_VOLTAGE_INCREMENT = 0.125;
+
+          // Standard speeds (MK4 L3 modules capable of 5.27 m/s)
+          public static final double LINEAR_SPEED = 5.27;
+          public static final double LINEAR_ACCELERATION = 10;
+          public static final double ROTARY_SPEED = (LINEAR_SPEED / Hardware.ROTATION_RADIUS) * (2 * Math.PI);
+          public static final double ROTARY_ACCELERATION = ROTARY_SPEED * 3;
+
+          public static final SwerveSpeedLimits MAX_SPEED_LIMITS =
+              new SwerveSpeedLimits(LINEAR_SPEED, LINEAR_ACCELERATION, ROTARY_SPEED, ROTARY_ACCELERATION);
+
+          public static final Matrix<N3, N1> STATE_STD_DEVIATIONS = VecBuilder.fill(0.003, 0.003, 0.0002);
+
+          public static final SwerveModuleState[] X_SHAPE =
+              new SwerveModuleState[] {
+                new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+                new SwerveModuleState(0, Rotation2d.fromDegrees(-45)),
+                new SwerveModuleState(0, Rotation2d.fromDegrees(45)),
+                new SwerveModuleState(0, Rotation2d.fromDegrees(-45))
+          };
+    }
+
+    //Don't forget to set the subsystem in the Drivetrain Subsystem!
+    public static final SwerveDriveConfig SWERVE_CONFIG = new SwerveDriveConfig();
+
+    static {
+      SWERVE_CONFIG.buildMode = currentBuildMode;
+
+      SWERVE_CONFIG.pigeon2ID = GYRO_CAN_ID;
+      SWERVE_CONFIG.gyroCanbus = GYRO_CAN_BUS;
+
+      SWERVE_CONFIG.moduleDriveGains = MODULE_DRIVE_GAINS;
+      SWERVE_CONFIG.moduleTurnGains = MODULE_TURN_GAINS;
+      SWERVE_CONFIG.maxModuleTurnVelo = MAX_MODULE_TURN_SPEED;
+      SWERVE_CONFIG.maxModuleTurnAccel = MAX_MODULE_TURN_ACCELERATION;
+      SWERVE_CONFIG.moduleCanbus = MODULE_CAN_BUS;
+
+      SWERVE_CONFIG.standardSpeedLimits = MAX_SPEED_LIMITS;
+
+      SWERVE_CONFIG.autoThetaGains = AUTO_THETA_GAINS;
+      SWERVE_CONFIG.translationGains = AUTO_TRANSLATION_GAINS;
+
+
+      SWERVE_CONFIG.currentLimit = CURRENT_LIMITS_CONFIGS;
+
+      SWERVE_CONFIG.standardDeviations = STATE_STD_DEVIATIONS;
+      SWERVE_CONFIG.loopPeriod = LOOP_PERIOD;
+
+      SWERVE_CONFIG.setModuleInfos(MODULE_1_INFO, MODULE_2_INFO, MODULE_3_INFO, MODULE_4_INFO);
     }
   }
 
